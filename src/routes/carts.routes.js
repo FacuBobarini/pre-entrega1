@@ -10,21 +10,17 @@ cartRouter.post("/", async (req, res) => {
 cartRouter.get("/:cid", async (req, res) => {
   const allCarts = await newCart.getCartById(parseInt(req.params.cid));
 
-  res.status(200).send(allCarts);
+  res.status(200).send(allCarts.products);
 });
 
 cartRouter.post("/:cid/product/:pid", async (req, res) => {
   const addProduct = await newCart.addProductToCart(
     parseInt(req.params.pid),
-    parseInt(req.params.cid),
-    req.body
+    parseInt(req.params.cid)
   );
-
-  return res.status(200).send("Hola migueel");
-
-  /*return addProduct
-    ? res.status(200).send({ message: "Se agrego el producto" })
-    : res.status(404).send({ message: "No se encontró el producto" });*/
+  return addProduct.error
+    ? res.status(404).send(addProduct)
+    : res.status(200).send(addProduct.message);
 });
 
 export default cartRouter;

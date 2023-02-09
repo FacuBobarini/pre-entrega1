@@ -32,7 +32,9 @@ class ProductManager {
       !product.description ||
       !product.price ||
       !product.code ||
-      !product.stock
+      !product.stock ||
+      !product.status ||
+      !product.category
     ) {
       return (result = { error: true, message: "Completa todos los campos!" });
     } else {
@@ -40,10 +42,12 @@ class ProductManager {
         id: this.id,
         title: product.title,
         description: product.description,
-        price: product.price,
-        thumbnail: product.thumbnail,
         code: product.code,
+        price: product.price,
+        status: product.status,
         stock: product.stock,
+        category: product.category,
+        thumbnails: product.thumbnails,
       };
 
       codeErr === true
@@ -55,19 +59,19 @@ class ProductManager {
   }
 
   async getProductById(id) {
-    let allproducts = await this.#checkProducts();
+    let allProducts = await this.#checkProducts();
 
-    let result = allproducts.find((product) => product.id === id);
+    let result = allProducts.find((product) => product.id === id);
 
     return result;
   }
 
   async deleteProductById(id) {
-    let allproducts = await this.#checkProducts();
+    let allProducts = await this.#checkProducts();
 
-    let result = allproducts.find((product) => product.id === id);
+    let result = allProducts.find((product) => product.id === id);
 
-    let destroyProduct = allproducts.filter((product) => product.id != id);
+    let destroyProduct = allProducts.filter((product) => product.id != id);
     await fs.writeFile(this.path, JSON.stringify(destroyProduct));
     return result;
   }
@@ -75,16 +79,17 @@ class ProductManager {
   async updateProducts(id, product) {
     let result = await this.getProductById(id);
     if (result) {
-      let allproducts = await this.#checkProducts();
+      let allProducts = await this.#checkProducts();
 
-      let updatedProduct = allproducts.map((prod) => {
+      let updatedProduct = allProducts.map((prod) => {
         if (prod.id === id) {
           prod.title = product.title;
           prod.description = product.description;
-          prod.price = product.price;
-          prod.thumbnail = product.thumbnail;
           prod.code = product.code;
-          prod.stock = product.stock;
+          prod.price = product.price;
+          (prod.status = product.status), (prod.stock = product.stock);
+          prod.category = product.category;
+          prod.thumbnail = product.thumbnail;
         }
         return prod;
       });
@@ -97,6 +102,6 @@ class ProductManager {
   }
 }
 
-const newProduct = new ProductManager("./src/products.txt");
+const newProduct = new ProductManager("./src/models/products.txt");
 
 export { newProduct };
